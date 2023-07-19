@@ -1,0 +1,14 @@
+#goToWikidot {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  padding: 10px;
+  background-color: #008CBA;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+#goToWikidot:hover {
+  background-color: #007B9A;
+}

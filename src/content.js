@@ -61,5 +61,29 @@ let observer = new MutationObserver(function (mutations) {
     });
 });
 
-// pass in the target node, as well as the observer options
-observer.observe(target, { attributes: true, attributeOldValue: true });
+if (target) {
+    // configuration of the observer:
+    // pass in the target node, as well as the observer options
+    observer.observe(target, { attributes: true, attributeOldValue: true });
+}
+
+
+if (window.location.host.endsWith("wdfiles.com") && window.location.pathname.startsWith("/local--files")) {
+    // create a new button element
+    let btn = document.createElement("BUTTON");
+    btn.innerHTML = "Go to Page";
+    btn.id = "goToWikidot";
+
+    // get the current URL
+    let currentUrl = window.location.href;
+
+    // generate the target URL
+    let targetUrl = currentUrl.replace(/http:\/\/(.+?)\.wdfiles\.com\/local--files\//, "http://$1.wikidot.com/");
+
+    btn.onclick = function () {
+        window.location.href = targetUrl;
+    };
+
+    // add the button to the body
+    document.body.appendChild(btn);
+}
