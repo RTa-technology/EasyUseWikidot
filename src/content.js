@@ -1,15 +1,21 @@
-// function to format date
-function formatDate(element) {
+// function to extract UNIX time from class
+function extractUnixTimeFromClassName(element) {
     let classNames = element.className.split(" ");
 
-    // extract UNIX time from class
-    let unixTime;
     for (let j = 0; j < classNames.length; j++) {
         if (classNames[j].startsWith("time_")) {
-            unixTime = classNames[j].split("_")[1];
-            break;
+            return classNames[j].split("_")[1];
         }
     }
+
+    return null;
+}
+
+// function to format date
+function formatDate(element) {
+    let unixTime = extractUnixTimeFromClassName(element);
+
+    if (!unixTime) return;
 
     // convert UNIX time to Date object
     let dateObj = new Date(unixTime * 1000);
@@ -32,7 +38,6 @@ function formatDate(element) {
 
 // function to format all ".odate" elements
 function formatAllDates() {
-    // get all elements with class "odate"
     let odateElements = document.getElementsByClassName('odate');
 
     // iterate over each element
@@ -41,26 +46,23 @@ function formatAllDates() {
     }
 }
 
-if (window.location.host.endsWith("wdfiles.com") && window.location.pathname.startsWith("/local--files")) {
-    // create a new button element
-    let btn = document.createElement("BUTTON");
-    btn.innerHTML = "Go to Page";
-    btn.id = "goToWikidot";
-
-    // get the current URL
-    let currentUrl = window.location.href;
-
-    // generate the target URL
-    let targetUrl = currentUrl.replace(/http:\/\/(.+?)\.wdfiles\.com\/local--files\//, "http://$1.wikidot.com/");
-
-    btn.onclick = function () {
-        window.location.href = targetUrl;
-    };
-
-    // add the button to the body
-    document.body.appendChild(btn);
+// function to extract post ID
+function extractPostId(element) {
+    return element.id.split('-')[1];
 }
 
+// function to create span element for url
+function createSpanElementForUrl(url) {
+    let linkElement = document.createElement('span');
+    linkElement.textContent = url;
+    linkElement.style.fontSize = '0.8em';
+    linkElement.style.color = '#888';
+    linkElement.style.display = 'block';
+
+    return linkElement;
+}
+
+// function to get thread ID from scriptsh
 function getThreadIdFromScripts() {
     // Get all script tags
     let scriptElements = document.getElementsByTagName('script');
@@ -81,56 +83,48 @@ function getThreadIdFromScripts() {
     return null;
 }
 
-
+// function to add link to posts
 function addLinkToPosts() {
-    // Get the thread ID from the global WIKIDOT object
     let threadId = getThreadIdFromScripts();
 
-    // If we're not in a forum thread, just return
-    if (typeof threadId === 'undefined') return;
+    if (!threadId) return;
 
-    // Get all elements with class "post"
     let postElements = document.getElementsByClassName('post');
 
-    // Iterate over each post element
     for (let i = 0; i < postElements.length; i++) {
         let postElement = postElements[i];
 
-        // Extract the post ID from the element ID
-        let postId = postElement.id.split('-')[1];
-
-        // Generate the URL using the current hostname, thread and post IDs
+        let postId = extractPostId(postElement);
         let url = `http://${window.location.hostname}/forum/t-${threadId}#post-${postId}`;
 
-        // Find .long and .short elements
         let longElement = postElement.querySelector('.long .head');
         let shortElement = postElement.querySelector('.short');
 
-        // Create new span elements with the link as its text content
-        let longLinkElement = document.createElement('span');
-        longLinkElement.textContent = url;
-        longLinkElement.style.fontSize = '0.8em'; // Make it slightly smaller
-        longLinkElement.style.color = '#888'; // Make it less prominent
-        longLinkElement.style.display = 'block'; // Ensure it's on its own line
+        let longLinkElement = createSpanElementForUrl(url);
+        let shortLinkElement = longLinkElement.cloneNode(true);
 
-        let shortLinkElement = longLinkElement.cloneNode(true); // Create a copy for the short element
-
-        // Add the new elements to .long and .short
         longElement.appendChild(longLinkElement);
         shortElement.appendChild(shortLinkElement);
     }
 }
 
 
+function createGoToPageButton() {
+    if (window.location.host.endsWith("wdfiles.com") && window.location.pathname.startsWith("/local--files")) {
+        let btn = document.createElement("BUTTON");
+        btn.innerHTML = "Go to Page";
+        btn.id = "goToWikidot";
 
+        let currentUrl = window.location.href;
+        let targetUrl = currentUrl.replace(/http:\/\/(.+?)\.wdfiles\.com\/local--files\//, "http://$1.wikidot.com/");
 
+        btn.onclick = function () {
+            window.location.href = targetUrl;
+        };
 
-
-// format all ".odate" elements at the start
-formatAllDates();
-
-// Add links to posts at the start
-addLinkToPosts();
+        document.body.appendChild(btn);
+    }
+}
 
 
 // target element to observe
@@ -142,17 +136,28 @@ let observer = new MutationObserver(function (mutations) {
         if (mutation.attributeName === "class") {
             let oldClassList = mutation.oldValue ? mutation.oldValue.split(' ') : [];
             let newClassList = mutation.target.className.split(' ');
+
             if (oldClassList.includes("wait") && !newClassList.includes("wait")) {
                 // delay the processing by 1 second to wait for DOM updates
-                setTimeout(formatAllDates, 1000);
-                setTimeout(addLinkToPosts, 1000);
+                setTimeout(() => {
+                    formatAllDates();
+                    addLinkToPosts();
+                }, 50);
             }
         }
     });
 });
 
+
 if (target) {
-    // configuration of the observer:
-    // pass in the target node, as well as the observer options
     observer.observe(target, { attributes: true, attributeOldValue: true });
 }
+
+// format all ".odate" elements at the start
+formatAllDates();
+
+// Add links to posts at the start
+addLinkToPosts();
+
+// create "Go to Page" button at the start
+createGoToPageButton();
