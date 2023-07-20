@@ -41,33 +41,6 @@ function formatAllDates() {
     }
 }
 
-// format all ".odate" elements at the start
-formatAllDates();
-
-// target element to observe
-let target = document.getElementById('html-body');
-
-// create an observer instance
-let observer = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-        if (mutation.attributeName === "class") {
-            let oldClassList = mutation.oldValue ? mutation.oldValue.split(' ') : [];
-            let newClassList = mutation.target.className.split(' ');
-            if (oldClassList.includes("wait") && !newClassList.includes("wait")) {
-                // delay the processing by 1 second to wait for DOM updates
-                setTimeout(formatAllDates, 1000);
-            }
-        }
-    });
-});
-
-if (target) {
-    // configuration of the observer:
-    // pass in the target node, as well as the observer options
-    observer.observe(target, { attributes: true, attributeOldValue: true });
-}
-
-
 if (window.location.host.endsWith("wdfiles.com") && window.location.pathname.startsWith("/local--files")) {
     // create a new button element
     let btn = document.createElement("BUTTON");
@@ -148,5 +121,38 @@ function addLinkToPosts() {
     }
 }
 
+
+
+
+
+
+// format all ".odate" elements at the start
+formatAllDates();
+
 // Add links to posts at the start
 addLinkToPosts();
+
+
+// target element to observe
+let target = document.getElementById('html-body');
+
+// create an observer instance
+let observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        if (mutation.attributeName === "class") {
+            let oldClassList = mutation.oldValue ? mutation.oldValue.split(' ') : [];
+            let newClassList = mutation.target.className.split(' ');
+            if (oldClassList.includes("wait") && !newClassList.includes("wait")) {
+                // delay the processing by 1 second to wait for DOM updates
+                setTimeout(formatAllDates, 1000);
+                setTimeout(addLinkToPosts, 1000);
+            }
+        }
+    });
+});
+
+if (target) {
+    // configuration of the observer:
+    // pass in the target node, as well as the observer options
+    observer.observe(target, { attributes: true, attributeOldValue: true });
+}
