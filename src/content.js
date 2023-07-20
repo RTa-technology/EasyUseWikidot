@@ -87,3 +87,66 @@ if (window.location.host.endsWith("wdfiles.com") && window.location.pathname.sta
     // add the button to the body
     document.body.appendChild(btn);
 }
+
+function getThreadIdFromScripts() {
+    // Get all script tags
+    let scriptElements = document.getElementsByTagName('script');
+
+    // Iterate over each script element
+    for (let i = 0; i < scriptElements.length; i++) {
+        let scriptContent = scriptElements[i].textContent;
+
+        // Check if this script sets WIKIDOT.forumThreadId
+        let match = scriptContent.match(/WIKIDOT\.forumThreadId\s*=\s*(\d+)/);
+        if (match) {
+            // Return the thread ID
+            return match[1];
+        }
+    }
+
+    // If no script sets WIKIDOT.forumThreadId, return null
+    return null;
+}
+
+
+function addLinkToPosts() {
+    // Get the thread ID from the global WIKIDOT object
+    let threadId = getThreadIdFromScripts();
+
+    // If we're not in a forum thread, just return
+    if (typeof threadId === 'undefined') return;
+
+    // Get all elements with class "post"
+    let postElements = document.getElementsByClassName('post');
+
+    // Iterate over each post element
+    for (let i = 0; i < postElements.length; i++) {
+        let postElement = postElements[i];
+
+        // Extract the post ID from the element ID
+        let postId = postElement.id.split('-')[1];
+
+        // Generate the URL using the current hostname, thread and post IDs
+        let url = `http://${window.location.hostname}/forum/t-${threadId}#post-${postId}`;
+
+        // Find .long and .short elements
+        let longElement = postElement.querySelector('.long .head');
+        let shortElement = postElement.querySelector('.short');
+
+        // Create new span elements with the link as its text content
+        let longLinkElement = document.createElement('span');
+        longLinkElement.textContent = url;
+        longLinkElement.style.fontSize = '0.8em'; // Make it slightly smaller
+        longLinkElement.style.color = '#888'; // Make it less prominent
+        longLinkElement.style.display = 'block'; // Ensure it's on its own line
+
+        let shortLinkElement = longLinkElement.cloneNode(true); // Create a copy for the short element
+
+        // Add the new elements to .long and .short
+        longElement.appendChild(longLinkElement);
+        shortElement.appendChild(shortLinkElement);
+    }
+}
+
+// Add links to posts at the start
+addLinkToPosts();
