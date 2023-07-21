@@ -21,7 +21,7 @@ jobs:
       run: zip -r extension.zip ./src
       
     - name: ls
-      run: ls
+      run: ls && echo ${{ secrets.EXTENSION_ID }}
 
     - name: Upload to Chrome Web Store
       uses: mnao305/chrome-extension-upload@v4.0.1
