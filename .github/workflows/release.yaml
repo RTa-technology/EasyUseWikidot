@@ -19,6 +19,9 @@ jobs:
 
     - name: Zip extension directory
       run: zip -r extension.zip ./src
+      
+    - name: ls
+      run: ls
 
     - name: Upload to Chrome Web Store
       uses: mnao305/chrome-extension-upload@v4.0.1
@@ -27,4 +30,4 @@ jobs:
         client-id: ${{ secrets.CLIENT_ID }}
         client-secret: ${{ secrets.CLIENT_SECRET }}
         refresh-token: ${{ secrets.REFRESH_TOKEN }}
-        zip-file: extension.zip
+        file-path: extension.zip
