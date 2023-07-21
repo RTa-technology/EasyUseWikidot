@@ -23,10 +23,10 @@ jobs:
     - name: ls
       run: ls && echo ${{ secrets.EXTENSION_ID }}
 
-    - name: Upload to Chrome Web Store
+    - name: Upload & release
       uses: mnao305/chrome-extension-upload@v4.0.1
       with:
-        extension-id: 'lhboebdlkjfjnmkaigcafkbggfnjpjao' 
+        extension-id: "${{ secrets.EXTENSION_ID }}"
         client-id: ${{ secrets.CLIENT_ID }}
         client-secret: ${{ secrets.CLIENT_SECRET }}
         refresh-token: ${{ secrets.REFRESH_TOKEN }}
