@@ -1,0 +1,29 @@
+name: Upload to Chrome Web Store
+
+on:
+  release:
+    branches:
+      - main
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install zip
+      run: sudo apt-get install zip
+
+    - name: Zip extension directory
+      run: zip -r extension.zip ./src
+
+    - name: Upload to Chrome Web Store
+      uses: GoogleChromeLabs/chrome-extension-upload-action@v4.0.1
+      with:
+        extension-id: ${{ secrets.EXTENSION_ID }}
+        client-id: ${{ secrets.CLIENT_ID }}
+        client-secret: ${{ secrets.CLIENT_SECRET }}
+        refresh-token: ${{ secrets.REFRESH_TOKEN }}
+        zip-file: extension.zip
