@@ -20,7 +20,7 @@ jobs:
       run: zip -r extension.zip ./src
 
     - name: Upload to Chrome Web Store
-      uses: GoogleChromeLabs/chrome-extension-upload-action@v4.0.1
+      uses: mnao305/chrome-extension-upload@v4.0.1
       with:
         extension-id: ${{ secrets.EXTENSION_ID }}
         client-id: ${{ secrets.CLIENT_ID }}
