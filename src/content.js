@@ -100,8 +100,17 @@ function addLinkToPosts() {
         let longElement = postElement.querySelector('.long .head');
         let shortElement = postElement.querySelector('.short');
 
+        // If link already exists in the element, remove it
+        let existingLongLink = longElement.querySelector('span.linkSpan');
+        let existingShortLink = shortElement.querySelector('span.linkSpan');
+        if (existingLongLink) longElement.removeChild(existingLongLink);
+        if (existingShortLink) shortElement.removeChild(existingShortLink);
+
+        // Now create and add the new link
         let longLinkElement = createSpanElementForUrl(url);
+        longLinkElement.className = "linkSpan";
         let shortLinkElement = longLinkElement.cloneNode(true);
+        shortLinkElement.className = "linkSpan";
 
         longElement.appendChild(longLinkElement);
         shortElement.appendChild(shortLinkElement);
