@@ -135,6 +135,40 @@ function createGoToPageButton() {
     }
 }
 
+const pagesourcetargetvalue = `
+> `;
+
+// 要素の変更を監視して更新する関数
+function checkAndUpdateTextContent(element) {
+    // もしelementがテキストノードで、内容が '> ' の場合
+    if (element.nodeType === Node.TEXT_NODE && element.nodeValue === pagesourcetargetvalue) {
+        element.parentNode.innerHTML = element.parentNode.innerHTML.replace(/\&gt; /g, '&gt;&nbsp;');
+        return;
+    }
+
+    // elementがテキストノードでない場合、その子要素を再帰的に探索
+    for (let child of element.childNodes) {
+        checkAndUpdateTextContent(child);
+    }
+}
+
+
+// Observerのコールバック関数
+function callbackForPageSource(mutationsList, observer) {
+    for (let mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+            mutation.addedNodes.forEach(node => {
+                // 対象の要素であるかを確認
+                if (node.matches && node.matches("#action-area > div.page-source")) {
+                    checkAndUpdateTextContent(node);
+                }
+            });
+        }
+    }
+}
+
+
+
 
 // target element to observe
 let target = document.getElementById('html-body');
@@ -160,6 +194,18 @@ let observer = new MutationObserver(function (mutations) {
 
 if (target) {
     observer.observe(target, { attributes: true, attributeOldValue: true });
+}
+
+// Observerのインスタンスを作成
+const observerForPageSource = new MutationObserver(callbackForPageSource);
+
+// #action-area要素を監視する設定
+let actionArea = document.querySelector("#action-area");
+if (actionArea) {
+    observerForPageSource.observe(actionArea, {
+        childList: true,
+        subtree: true
+    });
 }
 
 // format all ".odate" elements at the start
